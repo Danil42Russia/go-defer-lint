@@ -1,16 +1,37 @@
 package gorules
 
-import (
-	_ "github.com/jmoiron/sqlx"
-	"github.com/quasilyte/go-ruleguard/dsl"
-)
+import "github.com/quasilyte/go-ruleguard/dsl"
 
-func deferSqlxOpen(m dsl.Matcher) {
-	m.Import("github.com/jmoiron/sqlx")
+func deferHttpPackage(m dsl.Matcher) {
+	m.Match("$req, $err := http.NewRequest($*_, $*_, $*_); $chk; $close").
+		Where(m["req"].Type.Is(`*http.Request`) &&
+			m["err"].Type.Implements(`error`) &&
+			!m["close"].Text.Matches(`defer .*\.Body.Close()`)).
+		Report("can rewrite as defer '$req.Body.Close()'")
 
-	m.Match("$db, $err := sqlx.Open($*_, $*_); $chk; $close").
-		Where(m["db"].Type.Is(`*sqlx.DB`) &&
+	m.Match("$resp, $err := http.Get($*_); $chk; $close").
+		Where(m["resp"].Type.Is(`*http.Response`) &&
+			m["err"].Type.Implements(`error`) &&
+			!m["close"].Text.Matches(`defer .*\.Body.Close()`)).
+		Report("can rewrite as defer '$resp.Body.Close()'")
+
+	m.Match("$resp, $err := http.Post($*_, $*_, $*_); $chk; $close").
+		Where(m["resp"].Type.Is(`*http.Response`) &&
+			m["err"].Type.Implements(`error`) &&
+			!m["close"].Text.Matches(`defer .*.Body.Close()`)).
+		Report("can rewrite as defer '$resp.Body.Close()'")
+}
+
+func deferOsPackage(m dsl.Matcher) {
+	m.Match("$f, $err := os.Open($*_); $chk; $close").
+		Where(m["f"].Type.Is(`*os.File`) &&
 			m["err"].Type.Implements(`error`) &&
 			!m["close"].Text.Matches(`defer .*\.Close()`)).
-		Report("can rewrite as defer '$db.Close()'")
+		Report("can rewrite as defer '$f.Close()'")
+
+	m.Match("$f, $err := os.Create($*_); $chk; $close").
+		Where(m["f"].Type.Is(`*os.File`) &&
+			m["err"].Type.Implements(`error`) &&
+			!m["close"].Text.Matches(`defer .*\.Close()`)).
+		Report("can rewrite as defer '$f.Close()'")
 }

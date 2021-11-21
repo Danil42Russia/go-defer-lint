@@ -1,1 +1,4 @@
-# go-sql-lint
+# go-defer-lint (MVP)
+
+## Rules
+
