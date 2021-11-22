@@ -7,7 +7,7 @@ import (
 )
 
 func deferHttpRequest() {
-	req, err := http.NewRequest("GET", "http://localhost", http.NoBody) // want `\Qcan rewrite as defer 'req.Body.Close()'`
+	req, err := http.NewRequest("GET", "http://localhost", http.NoBody) // want `\Qcan rewrite as 'defer req.Body.Close()'`
 	if err != nil {
 	}
 	req.Body.Close()
@@ -15,7 +15,7 @@ func deferHttpRequest() {
 }
 
 func deferHttpGet() {
-	resp, err := http.Get("http://localhost") // want `\Qcan rewrite as defer 'resp.Body.Close()'`
+	resp, err := http.Get("http://localhost") // want `\Qcan rewrite as 'defer resp.Body.Close()'`
 	if err != nil {
 	}
 	resp.Body.Close()
@@ -23,7 +23,7 @@ func deferHttpGet() {
 }
 
 func deferPostGet() {
-	resp, err := http.Post("http://localhost", "", http.NoBody) // want `\Qcan rewrite as defer 'resp.Body.Close()'`
+	resp, err := http.Post("http://localhost", "", http.NoBody) // want `\Qcan rewrite as 'defer resp.Body.Close()'`
 	if err != nil {
 	}
 	resp.Body.Close()
@@ -31,7 +31,7 @@ func deferPostGet() {
 }
 
 func deferOsOpen() {
-	file, err := os.Open("test") // want `\Qcan rewrite as defer 'file.Close()'`
+	file, err := os.Open("test") // want `\Qcan rewrite as 'defer file.Close()'`
 	if err != nil {
 	}
 
@@ -39,7 +39,7 @@ func deferOsOpen() {
 }
 
 func deferOsCleate() {
-	file, err := os.Create("test") // want `\Qcan rewrite as defer 'file.Close()'`
+	file, err := os.Create("test") // want `\Qcan rewrite as 'defer file.Close()'`
 	if err != nil {
 	}
 
